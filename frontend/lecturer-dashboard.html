@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Modules - MUBAS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <span id="userName">Loading...</span>
+            <span style="background:rgba(23,162,184,0.9);padding:3px 10px;border-radius:15px;font-size:11px;" id="userRole">LECTURER</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <nav class="sidebar">
+            <div class="user-avatar">
+                <div class="avatar" id="sideAvatar">--</div>
+                <h3 id="sideName">Loading...</h3>
+                <p id="sideRole">Lecturer</p>
+                <p id="sideDept" style="font-size:11px;color:#888;margin-top:5px;"></p>
+            </div>
+            <ul class="nav-links">
+                <li class="active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span>My Modules</span>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-title">
+                <h2>My Modules</h2>
+                <p>Modules you are teaching this semester — click one to see the classes</p>
+            </div>
+
+            <div class="gpa-cards" style="margin-bottom:24px;">
+                <div class="gpa-card">
+                    <h4>Modules</h4>
+                    <div class="value" id="statModules">--</div>
+                    <div class="label">This semester</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Classes</h4>
+                    <div class="value" id="statClasses">--</div>
+                    <div class="label">Total groups</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Students</h4>
+                    <div class="value" id="statStudents">--</div>
+                    <div class="label">Enrolled this semester</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Grading Progress</h4>
+                    <div class="value" id="statProgress">--</div>
+                    <div class="label">Grades entered</div>
+                </div>
+            </div>
+
+            <div id="modulesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+                <div style="text-align:center;padding:40px;color:#888;grid-column:1/-1;">Loading modules...</div>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('open');
+        }
+    </script>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/lecturer.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

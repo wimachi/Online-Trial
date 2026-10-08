@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Exams - MUBAS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1100px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="margin:0;">Missing Exams</h2>
+                <p style="margin:5px 0 0 0;color:#666;">Request a resit when you miss an assessment (PDF §5)</p>
+            </div>
+            <button onclick="openMissingModal()" class="btn btn-primary">Submit Missing Exam Request</button>
+        </div>
+
+        <div style="margin-bottom:20px;padding:15px 20px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:13px;color:#333;">
+            <strong>Rule §5:</strong> Valid reasons (illness with medical proof, bereavement, etc.) allow a resit. No valid reason → grade of ZERO.
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>My Missing Exam History</h3>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requested</th>
+                            <th>Module · Assessment</th>
+                            <th>Reason</th>
+                            <th style="text-align:center;">Status</th>
+                            <th>Resit Date</th>
+                            <th>Decision Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="missingBody">
+                        <tr><td colspan="6" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="missingModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Submit Missing Exam Request</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">Must be justified with a valid reason</p>
+                </div>
+                <button onclick="closeMissingModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Assessment <span style="color:#dc3545;">*</span></label>
+                    <select id="meAssessment" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">Loading assessments...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Reason Category <span style="color:#dc3545;">*</span></label>
+                    <select id="meReason" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="Illness">Illness (medical evidence required)</option>
+                        <option value="Bereavement">Bereavement</option>
+                        <option value="Other Valid">Other Valid Reason</option>
+                        <option value="No Valid Reason">No Valid Reason (§5.3 → zero)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Reason Details <span style="color:#dc3545;">*</span></label>
+                    <textarea id="meDetails" rows="4" placeholder="Explain what happened. Be specific."
+                        style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Supporting Documents (optional)</label>
+                    <input type="text" id="meDocs" placeholder="e.g. Medical certificate reference number"
+                        style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                </div>
+                <div id="meError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="meSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeMissingModal()" class="btn btn-secondary">Cancel</button>
+                <button id="meSubmitBtn" onclick="submitMissing()" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/student-missing-exams.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

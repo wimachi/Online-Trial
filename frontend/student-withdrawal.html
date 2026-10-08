@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawal Request - MUBAS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1100px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="margin:0;">Withdrawal from Programme</h2>
+                <p style="margin:5px 0 0 0;color:#666;">Voluntary or temporary withdrawal (PDF §8)</p>
+            </div>
+            <button onclick="openWithdrawalModal()" class="btn btn-primary">Request Withdrawal</button>
+        </div>
+
+        <div style="margin-bottom:20px;padding:15px 20px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;font-size:13px;color:#333;">
+            <strong>Voluntary withdrawal (§8.1)</strong> — permanent. You cannot be re-admitted.<br>
+            <strong>Temporary withdrawal (§8.2)</strong> — up to 1 academic year. Max once per programme.
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>My Withdrawal History</h3>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requested</th>
+                            <th>Type</th>
+                            <th>Reason</th>
+                            <th>Start</th>
+                            <th>Expected Return</th>
+                            <th style="text-align:center;">Status</th>
+                            <th>Decision Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawalsBody">
+                        <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdrawalModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Request Withdrawal</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">Your request will be reviewed by the administration</p>
+                </div>
+                <button onclick="closeWithdrawalModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Withdrawal Type <span style="color:#dc3545;">*</span></label>
+                    <select id="wdType" onchange="toggleReturnDate()" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">— Select —</option>
+                        <option value="Voluntary">Voluntary — I am leaving permanently (§8.1)</option>
+                        <option value="Temporary">Temporary — I plan to return (§8.2)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Reason <span style="color:#dc3545;">*</span></label>
+                    <select id="wdReason" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">— Select —</option>
+                        <option value="Financial">Financial</option>
+                        <option value="Health">Health (medical)</option>
+                        <option value="Pregnancy">Pregnancy</option>
+                        <option value="Compassionate">Compassionate (e.g. bereavement)</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Details</label>
+                    <textarea id="wdDetails" rows="3" placeholder="Optional — additional context"
+                        style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Start Date <span style="color:#dc3545;">*</span></label>
+                        <input type="date" id="wdStart" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                    </div>
+                    <div id="returnDateWrap" style="display:none;">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Expected Return <span style="color:#dc3545;">*</span></label>
+                        <input type="date" id="wdReturn" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                    </div>
+                </div>
+                <div id="wdError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="wdSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeWithdrawalModal()" class="btn btn-secondary">Cancel</button>
+                <button id="wdSubmitBtn" onclick="submitWithdrawal()" class="btn btn-primary">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/student-withdrawal.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

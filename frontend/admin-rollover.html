@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year Rollover - MUBAS Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:40px;width:auto;background:white;padding:4px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <span style="background:rgba(40,167,69,0.9);padding:3px 10px;border-radius:15px;font-size:11px;" id="userRole">ADMIN</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1000px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;">
+            <h2 style="margin:0;">Academic Year Rollover</h2>
+            <p style="margin:5px 0 0 0;color:#666;">Advance the university to the next academic year</p>
+        </div>
+
+        <div class="table-container" style="padding:25px;margin-bottom:25px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;position:relative;overflow-x:auto;padding-bottom:10px;">
+                <div style="position:absolute;top:20px;left:30px;right:30px;height:2px;background:#e0e7f0;z-index:0;"></div>
+                <div class="step-dot" data-step="1" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">1</div>
+                    <div style="font-size:12px;color:#666;">Create Year</div>
+                </div>
+                <div class="step-dot" data-step="2" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">2</div>
+                    <div style="font-size:12px;color:#666;">Offerings</div>
+                </div>
+                <div class="step-dot" data-step="3" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">3</div>
+                    <div style="font-size:12px;color:#666;">Promote</div>
+                </div>
+                <div class="step-dot" data-step="4" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">4</div>
+                    <div style="font-size:12px;color:#666;">Graduate</div>
+                </div>
+                <div class="step-dot" data-step="5" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">5</div>
+                    <div style="font-size:12px;color:#666;">Assessments</div>
+                </div>
+                <div class="step-dot" data-step="6" style="position:relative;z-index:1;text-align:center;flex:1;min-width:80px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6c757d;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 8px;font-size:16px;">6</div>
+                    <div style="font-size:12px;color:#666;">Activate</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="rolloverContent" class="table-container" style="padding:30px;min-height:400px;">
+            <div id="step-1">
+                <h3 style="color:#003366;margin-top:0;">Step 1: Create New Academic Year</h3>
+                <p style="color:#666;font-size:14px;">This creates the new year in an <strong>inactive</strong> state. The current year remains active until Step 6.</p>
+                <div style="background:#ecfeff;padding:15px;border-left:4px solid #0891b2;border-radius:6px;margin:20px 0;font-size:13px;" id="step1Preview">
+                    Loading preview...
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin-bottom:20px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Year Name</label>
+                        <input type="text" id="newYearName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Start Date</label>
+                        <input type="date" id="newYearStart" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">End Date</label>
+                        <input type="date" id="newYearEnd" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;">
+                    </div>
+                </div>
+                <button id="btnStep1" onclick="executeStep1()" class="btn btn-primary">Create Year (Inactive)</button>
+                <div id="step1Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+
+            <div id="step-2" style="display:none;">
+                <h3 style="color:#003366;margin-top:0;">Step 2: Auto-Create Offerings</h3>
+                <p style="color:#666;font-size:14px;">Creates offerings for every module in every program's curriculum for the new year.</p>
+                <button id="btnStep2" onclick="executeStep2()" class="btn btn-primary" style="margin-top:15px;">Create Offerings</button>
+                <div id="step2Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+
+            <div id="step-3" style="display:none;">
+                <h3 style="color:#003366;margin-top:0;">Step 3: Promote Students</h3>
+                <p style="color:#666;font-size:14px;">Advances all non-final-year students to the next year and auto-enrolls them in new semester-1 modules.</p>
+                <p style="color:#dc2626;font-size:13px;"><strong>Final-year students are skipped</strong> — they are handled in Step 4.</p>
+                <button id="btnStep3" onclick="executeStep3()" class="btn btn-primary" style="margin-top:15px;">Promote Students</button>
+                <div id="step3Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+
+            <div id="step-4" style="display:none;">
+                <h3 style="color:#003366;margin-top:0;">Step 4: Graduate Final-Year Students</h3>
+                <p style="color:#666;font-size:14px;">Marks eligible final-year students as <strong>Graduated</strong> and computes their award classification.</p>
+                <button id="btnStep4" onclick="executeStep4()" class="btn btn-primary" style="margin-top:15px;">Graduate Final-Year Students</button>
+                <div id="step4Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+
+            <div id="step-5" style="display:none;">
+                <h3 style="color:#003366;margin-top:0;">Step 5: Seed Assessments</h3>
+                <p style="color:#666;font-size:14px;">Adds the standard 3 assessments (Quiz 20% + Assignment 30% + Final Exam 50%) to every new offering.</p>
+                <button id="btnStep5" onclick="executeStep5()" class="btn btn-primary" style="margin-top:15px;">Seed Assessments</button>
+                <div id="step5Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+
+            <div id="step-6" style="display:none;">
+                <h3 style="color:#003366;margin-top:0;">Step 6: Activate New Year</h3>
+                <p style="color:#666;font-size:14px;">The final atomic switch. Deactivates the old year, activates the new year. Students will now see their new modules.</p>
+                <div style="background:#fffbeb;padding:15px;border-left:4px solid #f59e0b;border-radius:6px;margin:20px 0;font-size:13px;">
+                    <strong>This is the final step.</strong> Make sure Steps 1-5 are all complete. Once activated, the previous year becomes read-only.
+                </div>
+                <button id="btnStep6" onclick="executeStep6()" class="btn btn-success">Activate New Year</button>
+                <div id="step6Result" style="display:none;margin-top:20px;padding:15px;background:#f0fdf4;border-radius:6px;font-size:13px;"></div>
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:10px;">
+            <button onclick="prevStep()" id="btnPrev" class="btn btn-secondary">← Previous</button>
+            <button onclick="nextStep()" id="btnNext" class="btn btn-primary">Next →</button>
+        </div>
+
+        <div style="margin-top:30px;padding:20px;background:#fffbeb;border-left:4px solid #dc2626;border-radius:8px;">
+            <h3 style="margin:0 0 8px 0;color:#dc2626;font-size:16px;">Emergency Rollback</h3>
+            <p style="margin:0 0 15px 0;font-size:13px;color:#333;">
+                If a rollover went wrong, you can undo it here. This deletes the year you specify,
+                all its semesters, offerings, and enrollments, and re-activates the previous year.
+            </p>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="rollbackYearName" placeholder="e.g. 2027/2028"
+                    style="flex:1;min-width:200px;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                <button onclick="executeRollback()" class="btn btn-danger">Roll Back This Year</button>
+            </div>
+            <div id="rollbackResult" style="display:none;margin-top:15px;padding:12px;border-radius:6px;font-size:13px;"></div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin-rollover.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

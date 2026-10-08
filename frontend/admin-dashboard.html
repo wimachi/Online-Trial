@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MUBAS Assessment System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <span id="userName">Loading...</span>
+            <span style="background:rgba(40,167,69,0.9);padding:3px 10px;border-radius:15px;font-size:11px;" id="userRole">ADMIN</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <nav class="sidebar">
+            <div class="user-avatar">
+                <div class="avatar" id="sideAvatar">AD</div>
+                <h3 id="sideName">Administrator</h3>
+                <p id="sideRole">MUBAS Assessment</p>
+                <p id="sideScope" style="font-size:11px;color:#888;margin-top:5px;"></p>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-page="overview" onclick="showPage('overview')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Overview</span>
+                </li>
+                <li data-page="approvals" id="navApprovals" onclick="showPage('approvals')" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Pending Approvals</span>
+                </li>
+                <li data-page="reports" id="navReports" onclick="showPage('reports')" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span>Reports</span>
+                </li>
+                <li data-page="students" onclick="showPage('students')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Students</span>
+                </li>
+                <li data-page="lecturers" onclick="showPage('lecturers')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                    <span>Lecturers</span>
+                </li>
+                <li data-page="programs" onclick="showPage('programs')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span>Programs</span>
+                </li>
+                <li data-page="modules" onclick="showPage('modules')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    <span>Modules</span>
+                </li>
+                <li data-page="structure" onclick="showPage('structure')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                    <span>Structure</span>
+                </li>
+                <li id="navRollover" onclick="window.location.href='/admin-rollover.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    <span>Year Rollover</span>
+                </li>
+                <li id="navPolicy" onclick="window.location.href='/admin-policy.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    <span>Policy Cases</span>
+                </li>
+                <li id="navAppeals" onclick="window.location.href='/admin-appeals.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+                    <span>Student Appeals</span>
+                </li>
+                <li id="navWithdrawals" onclick="window.location.href='/admin-withdrawals.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Withdrawals</span>
+                </li>
+                <li id="navMissingExams" onclick="window.location.href='/admin-missing-exams.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    <span>Missing Exams</span>
+                </li>
+                <li id="navIncompleteGrades" onclick="window.location.href='/admin-incomplete-grades.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Incomplete Grades</span>
+                </li>
+                <li id="navAegrotats" onclick="window.location.href='/admin-aegrotats.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <span>Aegrotat Passes</span>
+                </li>
+                <li id="navProgramChanges" onclick="window.location.href='/admin-program-changes.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <span>Programme Changes</span>
+                </li>
+                <li id="navPosthumous" onclick="window.location.href='/admin-posthumous.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span>Posthumous Awards</span>
+                </li>
+                <li id="navExitAwards" onclick="window.location.href='/admin-exit-awards.html'" style="display:none;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                    <span>Exit Awards</span>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div id="page-overview">
+                <div class="page-title">
+                    <h2>System Overview</h2>
+                    <p>Snapshot of the MUBAS Assessment System</p>
+                </div>
+
+                <div class="gpa-cards" id="statsCards">
+                    <div class="gpa-card">
+                        <h4>Total Students</h4>
+                        <div class="value" id="statStudents">--</div>
+                        <div class="label" id="statActiveStudents">Active</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Lecturers</h4>
+                        <div class="value" id="statLecturers">--</div>
+                        <div class="label">Active Staff</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Programs</h4>
+                        <div class="value" id="statPrograms">--</div>
+                        <div class="label">Across 5 Schools</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Modules</h4>
+                        <div class="value" id="statModules">--</div>
+                        <div class="label" id="statOfferings">Offerings</div>
+                    </div>
+                </div>
+
+                <div class="gpa-cards" style="margin-top:20px;">
+                    <div class="gpa-card">
+                        <h4>Schools</h4>
+                        <div class="value" id="statSchools">--</div>
+                        <div class="label">Academic Units</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Departments</h4>
+                        <div class="value" id="statDepartments">--</div>
+                        <div class="label">Across All Schools</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Graduated</h4>
+                        <div class="value" id="statGraduated">--</div>
+                        <div class="label">Completed Programs</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>System Users</h4>
+                        <div class="value" id="statUsers">--</div>
+                        <div class="label">Active Logins</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-students" style="display:none;">
+                <div class="page-title">
+                    <h2>Students</h2>
+                    <p>All enrolled students across all programs</p>
+                </div>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Student Registry</h3>
+                        <div class="filters">
+                            <select id="filterProgram" onchange="loadStudents()">
+                                <option value="">All Programs</option>
+                            </select>
+                            <select id="filterYear" onchange="loadStudents()">
+                                <option value="">All Years</option>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                                <option value="5">Year 5</option>
+                            </select>
+                            <input type="text" id="searchStudents" placeholder="Search by name or reg no..." oninput="loadStudents()">
+                            <button onclick="openRegisterStudent()" class="btn btn-success">Register Student</button>
+                            <button onclick="openEnrollStudent()" class="btn btn-primary">Enroll Student</button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Reg No</th>
+                                    <th>Name</th>
+                                    <th>Program</th>
+                                    <th>Year</th>
+                                    <th>Semester</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsBody">
+                                <tr><td colspan="7" style="text-align:center;color:#888;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-lecturers" style="display:none;">
+                <div class="page-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h2 style="margin:0;">Lecturers</h2>
+                        <p style="margin:5px 0 0 0;">Academic staff in your scope</p>
+                    </div>
+                    <button id="registerLecturerBtn" onclick="openRegisterLecturer()" class="btn btn-success">Register Lecturer</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff No</th>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Department</th>
+                                    <th>School</th>
+                                    <th style="text-align:center;">Distinct Modules</th>
+                                    <th style="text-align:center;">Class Groups</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lecturersBody">
+                                <tr><td colspan="7" style="text-align:center;color:#888;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-programs" style="display:none;">
+                <div class="page-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h2 style="margin:0;">Programs</h2>
+                        <p style="margin:5px 0 0 0;">All academic programs offered</p>
+                    </div>
+                    <button id="createModuleBtn" onclick="openCreateModule()" class="btn btn-success">Create Module</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Duration</th>
+                                    <th>Department</th>
+                                    <th>Students</th>
+                                    <th>Modules</th>
+                                </tr>
+                            </thead>
+                            <tbody id="programsBody">
+                                <tr><td colspan="7" style="text-align:center;color:#888;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-modules" style="display:none;">
+                <div class="page-title">
+                    <h2>Modules</h2>
+                    <p>All modules in the system</p>
+                </div>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Module Registry</h3>
+                        <div class="filters">
+                            <select id="filterModuleDept" onchange="loadModules()">
+                                <option value="">All Departments</option>
+                            </select>
+                            <input type="text" id="searchModules" placeholder="Search by code or name..." oninput="loadModules()">
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th style="text-align:center;">Credits</th>
+                                    <th style="text-align:center;">Level</th>
+                                    <th>Department</th>
+                                    <th style="text-align:center;">Offerings</th>
+                                    <th style="text-align:center;">Students</th>
+                                    <th style="text-align:center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modulesBody">
+                                <tr><td colspan="8" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-structure" style="display:none;">
+                <div class="page-title">
+                    <h2>University Structure</h2>
+                    <p>Schools and their departments</p>
+                </div>
+                <div id="structureContainer">
+                    <div style="text-align:center;color:#888;padding:40px;">Loading...</div>
+                </div>
+            </div>
+
+            <div id="page-reports" style="display:none;">
+                <div class="page-title">
+                    <h2>Performance Reports</h2>
+                    <p>Academic performance analytics for your scope</p>
+                </div>
+                <div class="gpa-cards" style="margin-bottom:25px;">
+                    <div class="gpa-card">
+                        <h4>Modules Assessed</h4>
+                        <div class="value" id="repModules">--</div>
+                        <div class="label">With released grades</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Students Assessed</h4>
+                        <div class="value" id="repStudents">--</div>
+                        <div class="label">Unique students</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Overall Average</h4>
+                        <div class="value" id="repAvg">--</div>
+                        <div class="label">Across all modules</div>
+                    </div>
+                    <div class="gpa-card">
+                        <h4>Pass Rate</h4>
+                        <div class="value" id="repPassRate">--</div>
+                        <div class="label" id="repPassLabel">--</div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Module Performance</h3>
+                        <div style="display:flex;align-items:center;gap:15px;">
+                            <span style="font-size:13px;color:#888;" id="repTableCount">--</span>
+                            <button onclick="downloadReportsCSV()" class="btn btn-primary">Download CSV</button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Academic Year</th>
+                                    <th>Semester</th>
+                                    <th style="text-align:center;">Students</th>
+                                    <th style="text-align:center;">Avg Score</th>
+                                    <th style="text-align:center;">Min</th>
+                                    <th style="text-align:center;">Max</th>
+                                    <th style="text-align:center;">Pass Rate</th>
+                                    <th style="text-align:center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsBody">
+                                <tr><td colspan="9" style="text-align:center;color:#888;padding:30px;">Loading reports...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-approvals" style="display:none;">
+                <div class="page-title">
+                    <h2>Pending Approvals</h2>
+                    <p>Gradebooks submitted by lecturers in your department</p>
+                </div>
+                <div id="pendingApprovalsList">
+                    <div style="text-align:center;color:#888;padding:40px;">Loading approvals...</div>
+                </div>
+            </div>
+
+            <!-- ENROLL STUDENT MODAL -->
+            <div id="enrollStudentModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:600px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 30px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:20px;">Enroll Student</h2>
+                            <p style="margin:5px 0 0 0;font-size:13px;opacity:0.9;">Add a student to an active semester offering</p>
+                        </div>
+                        <button onclick="closeEnrollStudent()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+                    </div>
+                    <div style="padding:25px 30px;">
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Student <span style="color:#dc3545;">*</span></label>
+                            <select id="esStudent" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                <option value="">— Select Student —</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Filter by Program</label>
+                            <select id="esFilterProgram" onchange="filterEnrollOfferings()" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                <option value="">All Programs</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Offering <span style="color:#dc3545;">*</span></label>
+                            <select id="esOffering" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                <option value="">— Select Offering —</option>
+                            </select>
+                            <div style="font-size:11px;color:#888;margin-top:5px;">Only active semester offerings are shown</div>
+                        </div>
+                        <div id="esError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                        <div id="esSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+                    </div>
+                    <div style="padding:20px 30px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeEnrollStudent()" class="btn btn-secondary">Cancel</button>
+                        <button id="esSubmitBtn" onclick="submitEnrollStudent()" class="btn btn-primary">Enroll Student</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CREATE MODULE MODAL -->
+            <div id="createModuleModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:800px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 30px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:20px;">Create New Module</h2>
+                            <p style="margin:5px 0 0 0;font-size:13px;opacity:0.9;">Add a module to a department + optionally schedule it</p>
+                        </div>
+                        <button onclick="closeCreateModule()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+                    </div>
+                    <div style="padding:25px 30px;max-height:70vh;overflow-y:auto;">
+                        <h3 style="font-size:14px;color:#003366;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #eee;">Module Information</h3>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Module Code <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="cmCode" placeholder="e.g. CS999" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Credits <span style="color:#dc3545;">*</span></label>
+                                <input type="number" id="cmCredits" value="10" min="1" max="30" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Module Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="cmName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Level</label>
+                                <select id="cmLevel" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select —</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Department <span style="color:#dc3545;">*</span></label>
+                                <select id="cmDepartment" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Department —</option>
+                                </select>
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Description</label>
+                                <textarea id="cmDescription" rows="2" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                            </div>
+                        </div>
+                        <h3 style="font-size:14px;color:#003366;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #eee;">Curriculum Mapping</h3>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Add to Programs</label>
+                                <div id="cmPrograms" style="border:1px solid #cbd5e1;border-radius:6px;padding:10px;max-height:140px;overflow-y:auto;font-size:13px;">
+                                    <div style="color:#888;">Loading programs...</div>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Year of Study</label>
+                                <select id="cmYearOfStudy" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;margin-bottom:10px;">
+                                    <option value="1">Year 1</option>
+                                    <option value="2">Year 2</option>
+                                    <option value="3">Year 3</option>
+                                    <option value="4">Year 4</option>
+                                    <option value="5">Year 5</option>
+                                </select>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Curriculum Semester</label>
+                                <select id="cmCurrSem" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <h3 style="font-size:14px;color:#003366;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #eee;">Schedule Offering (optional)</h3>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#333;cursor:pointer;">
+                                <input type="checkbox" id="cmCreateOffering" checked>
+                                <span>Schedule this module in the <strong>current active semester</strong></span>
+                            </label>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;" id="cmOfferingSection">
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Lecturer</label>
+                                <select id="cmLecturer" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Lecturer —</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Room</label>
+                                <input type="text" id="cmRoom" placeholder="e.g. A101" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Capacity</label>
+                                <input type="number" id="cmCapacity" value="60" min="1" max="300" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Schedule</label>
+                                <input type="text" id="cmSchedule" placeholder="e.g. Mon 8-10am, Wed 10-12pm" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                        </div>
+                        <div id="cmError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                        <div id="cmSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+                    </div>
+                    <div style="padding:20px 30px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeCreateModule()" class="btn btn-secondary">Cancel</button>
+                        <button id="cmSubmitBtn" onclick="submitCreateModule()" class="btn btn-primary">Create Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTER LECTURER MODAL -->
+            <div id="registerLecturerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:700px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#17a2b8,#20c997);color:white;padding:20px 30px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:20px;">Register New Lecturer</h2>
+                            <p style="margin:5px 0 0 0;font-size:13px;opacity:0.9;">Creates user account + lecturer record</p>
+                        </div>
+                        <button onclick="closeRegisterLecturer()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+                    </div>
+                    <div style="padding:25px 30px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Staff Number <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rlStaffNumber" placeholder="e.g. LEC099" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Title</label>
+                                <select id="rlTitle" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">—</option>
+                                    <option value="Prof.">Prof.</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Ms.">Ms.</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">First Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rlFirstName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Last Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rlLastName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Email <span style="color:#dc3545;">*</span></label>
+                                <input type="email" id="rlEmail" placeholder="e.g. name@mubas.mw" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Phone</label>
+                                <input type="text" id="rlPhone" placeholder="+265 xxx xxx xxx" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Department <span style="color:#dc3545;">*</span></label>
+                                <select id="rlDepartment" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Department —</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Position <span style="color:#dc3545;">*</span></label>
+                                <select id="rlPosition" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Position —</option>
+                                    <option value="Professor">Professor</option>
+                                    <option value="Associate Professor">Associate Professor</option>
+                                    <option value="Senior Lecturer">Senior Lecturer</option>
+                                    <option value="Lecturer">Lecturer</option>
+                                    <option value="Assistant Lecturer">Assistant Lecturer</option>
+                                    <option value="Teaching Assistant">Teaching Assistant</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Highest Qualification</label>
+                                <input type="text" id="rlQualification" placeholder="e.g. PhD Computer Science" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Date Joined</label>
+                                <input type="date" id="rlDateJoined" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#333;cursor:pointer;">
+                                    <input type="checkbox" id="rlIsHod">
+                                    <span>This lecturer is a <strong>Head of Department (HoD)</strong></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="rlError" style="display:none;margin-top:15px;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                        <div id="rlSuccess" style="display:none;margin-top:15px;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+                    </div>
+                    <div style="padding:20px 30px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeRegisterLecturer()" class="btn btn-secondary">Cancel</button>
+                        <button id="rlSubmitBtn" onclick="submitRegisterLecturer()" class="btn btn-info">Register Lecturer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTER STUDENT MODAL -->
+            <div id="registerStudentModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:700px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:20px 30px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:20px;">Register New Student</h2>
+                            <p style="margin:5px 0 0 0;font-size:13px;opacity:0.9;">Creates user account + student record + auto-enrolls</p>
+                        </div>
+                        <button onclick="closeRegisterStudent()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+                    </div>
+                    <div style="padding:25px 30px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Student Number <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rsStudentNumber" placeholder="e.g. BIT/26/SS/001" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">First Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rsFirstName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Last Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="rsLastName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Email <span style="color:#dc3545;">*</span></label>
+                                <input type="email" id="rsEmail" placeholder="e.g. name@student.mubas.mw" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Phone</label>
+                                <input type="text" id="rsPhone" placeholder="+265 xxx xxx xxx" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Gender</label>
+                                <select id="rsGender" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select —</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Date of Birth</label>
+                                <input type="date" id="rsDob" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Program <span style="color:#dc3545;">*</span></label>
+                                <select id="rsProgram" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Program —</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Enrollment Date</label>
+                                <input type="date" id="rsEnrollmentDate" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Current Year</label>
+                                <select id="rsYear" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="1">Year 1</option>
+                                    <option value="2">Year 2</option>
+                                    <option value="3">Year 3</option>
+                                    <option value="4">Year 4</option>
+                                    <option value="5">Year 5</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Current Semester</label>
+                                <select id="rsSemester" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="rsError" style="display:none;margin-top:15px;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                        <div id="rsSuccess" style="display:none;margin-top:15px;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+                    </div>
+                    <div style="padding:20px 30px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeRegisterStudent()" class="btn btn-secondary">Cancel</button>
+                        <button id="rsSubmitBtn" onclick="submitRegisterStudent()" class="btn btn-success">Register Student</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EDIT MODULE MODAL -->
+            <div id="editModuleModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:600px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:18px;">Edit Module</h2>
+                            <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;" id="editModuleCode">--</p>
+                        </div>
+                        <button onclick="closeEditModule()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+                    </div>
+                    <div style="padding:25px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Module Name <span style="color:#dc3545;">*</span></label>
+                                <input type="text" id="emName" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Credits <span style="color:#dc3545;">*</span></label>
+                                <input type="number" id="emCredits" min="1" max="60" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Level</label>
+                                <select id="emLevel" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">—</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Department <span style="color:#dc3545;">*</span></label>
+                                <select id="emDepartment" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                                    <option value="">— Select Department —</option>
+                                </select>
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Description</label>
+                                <textarea id="emDescription" rows="3" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                            </div>
+                        </div>
+                        <div id="emError" style="display:none;margin-top:15px;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                        <div id="emSuccess" style="display:none;margin-top:15px;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+                    </div>
+                    <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeEditModule()" class="btn btn-secondary">Cancel</button>
+                        <button id="emSubmitBtn" onclick="saveModule()" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVIEW MODAL -->
+            <div id="reviewModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="max-width:1100px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 30px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2 style="margin:0;font-size:20px;" id="reviewTitle">Review Gradebook</h2>
+                            <p style="margin:5px 0 0 0;font-size:13px;opacity:0.9;" id="reviewSubtitle"></p>
+                        </div>
+                        <button onclick="closeReview()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;">✕ Close</button>
+                    </div>
+                    <div style="padding:25px 30px;">
+                        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:25px;">
+                            <div style="background:#f0f4f8;padding:12px 15px;border-radius:8px;">
+                                <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Lecturer</div>
+                                <div style="font-weight:600;color:#333;margin-top:3px;font-size:13px;" id="reviewLecturer">--</div>
+                            </div>
+                            <div style="background:#f0f4f8;padding:12px 15px;border-radius:8px;">
+                                <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Program · Year</div>
+                                <div style="font-weight:600;color:#333;margin-top:3px;font-size:13px;" id="reviewProgram">--</div>
+                            </div>
+                            <div style="background:#f0f4f8;padding:12px 15px;border-radius:8px;">
+                                <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Department</div>
+                                <div style="font-weight:600;color:#333;margin-top:3px;font-size:13px;" id="reviewDept">--</div>
+                            </div>
+                            <div style="background:#f0f4f8;padding:12px 15px;border-radius:8px;">
+                                <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Students</div>
+                                <div style="font-weight:600;color:#333;margin-top:3px;font-size:13px;" id="reviewStudentCount">--</div>
+                            </div>
+                        </div>
+                        <h3 style="color:#003366;font-size:15px;margin-bottom:12px;">Student Grades</h3>
+                        <div class="table-scroll" style="margin-bottom:25px;border:1px solid #eee;border-radius:8px;">
+                            <table id="reviewGradesTable" style="width:100%;border-collapse:collapse;">
+                                <thead id="reviewGradesHead"></thead>
+                                <tbody id="reviewGradesBody"></tbody>
+                            </table>
+                        </div>
+                        <h3 style="color:#003366;font-size:15px;margin-bottom:12px;">Approval History</h3>
+                        <div id="reviewHistory" style="background:#f8f9fa;padding:15px;border-radius:8px;font-size:13px;">
+                            Loading...
+                        </div>
+                    </div>
+                    <div style="padding:20px 30px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="closeReview()" class="btn btn-secondary">Close</button>
+                        <button id="reviewRejectBtn" onclick="rejectFromModal()" class="btn btn-danger">Reject</button>
+                        <button id="reviewApproveBtn" onclick="approveFromModal()" class="btn btn-success">Approve</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('open');
+        }
+    </script>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Policy Cases - MUBAS Admin</title>
+    <!---<link rel="icon" type="image/png" href="/images/favicon.png">-->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" style="color:white;text-decoration:none;margin-right:15px;font-size:14px;">← Back to Dashboard</a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1400px;margin:30px auto;padding:0 30px;">
+
+        <div class="page-title" style="margin-bottom:25px;">
+            <h2 style="margin:0;">📋 Academic Policy Cases</h2>
+            <p style="margin:5px 0 0 0;color:#666;">Referrals, Carryovers, and Repeat Modules across your scope</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="gpa-cards" style="margin-bottom:25px;">
+            <div class="gpa-card">
+                <h4>Referrals</h4>
+                <div class="value" id="countReferrals" style="color:#003366;">--</div>
+                <div class="label">Awaiting resit</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Carryovers</h4>
+                <div class="value" id="countCarryovers" style="color:#17a2b8;">--</div>
+                <div class="label">Non-core failed modules</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Repeat Modules</h4>
+                <div class="value" id="countRepeats" style="color:#dc3545;">--</div>
+                <div class="label">Currently repeating</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Total Active Cases</h4>
+                <div class="value" id="countTotal" style="color:#28a745;">--</div>
+                <div class="label">All policies</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:5px;margin-bottom:15px;border-bottom:2px solid #e0e7f0;">
+            <button id="tabReferrals" onclick="showTab('referrals')" style="padding:12px 24px;background:#003366;color:white;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;font-size:14px;">
+                📕 Referrals (<span id="tabCountReferrals">0</span>)
+            </button>
+            <button id="tabCarryovers" onclick="showTab('carryovers')" style="padding:12px 24px;background:#f0f4f8;color:#333;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;font-size:14px;">
+                📘 Carryovers (<span id="tabCountCarryovers">0</span>)
+            </button>
+            <button id="tabRepeats" onclick="showTab('repeats')" style="padding:12px 24px;background:#f0f4f8;color:#333;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;font-size:14px;">
+                📗 Repeats (<span id="tabCountRepeats">0</span>)
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div style="background:white;padding:0;border-radius:0 0 10px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+
+            <!-- Referrals Tab -->
+            <div id="content-referrals">
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#003366;color:white;">
+                                <th style="padding:12px;text-align:left;">Student</th>
+                                <th style="padding:12px;text-align:left;">Module</th>
+                                <th style="padding:12px;text-align:center;">Credits</th>
+                                <th style="padding:12px;text-align:center;">Type</th>
+                                <th style="padding:12px;text-align:center;">Original GP</th>
+                                <th style="padding:12px;text-align:center;">Semester</th>
+                                <th style="padding:12px;text-align:center;">Status</th>
+                                <th style="padding:12px;text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralsBody">
+                            <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Carryovers Tab -->
+            <div id="content-carryovers" style="display:none;">
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#17a2b8;color:white;">
+                                <th style="padding:12px;text-align:left;">Student</th>
+                                <th style="padding:12px;text-align:left;">Module</th>
+                                <th style="padding:12px;text-align:center;">Credits</th>
+                                <th style="padding:12px;text-align:center;">Original GP</th>
+                                <th style="padding:12px;text-align:center;">From Semester</th>
+                                <th style="padding:12px;text-align:center;">Status</th>
+                                <th style="padding:12px;text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carryoversBody">
+                            <tr><td colspan="6" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Repeats Tab -->
+            <div id="content-repeats" style="display:none;">
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#dc3545;color:white;">
+                                <th style="padding:12px;text-align:left;">Student</th>
+                                <th style="padding:12px;text-align:left;">Module</th>
+                                <th style="padding:12px;text-align:center;">Credits</th>
+                                <th style="padding:12px;text-align:center;">Attempt</th>
+                                <th style="padding:12px;text-align:center;">Original GP</th>
+                                <th style="padding:12px;text-align:center;">Semester</th>
+                                <th style="padding:12px;text-align:center;">Status</th>
+                                <th style="padding:12px;text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repeatsBody">
+                            <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+        <!-- PROCESS POLICY CASE MODAL -->
+    <div id="processModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;">
+        <div style="max-width:600px;margin:80px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;" id="pmTitle">Process Case</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;" id="pmSubtitle"></p>
+                </div>
+                <button onclick="closeProcessModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div id="pmSummary" style="background:#f0f4f8;padding:15px;border-radius:8px;font-size:13px;margin-bottom:20px;line-height:1.7;"></div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:8px;">Outcome <span style="color:#dc3545;">*</span></label>
+                    <div style="display:flex;gap:10px;">
+                        <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #ccc;border-radius:8px;cursor:pointer;" id="pmPassLabel">
+                            <input type="radio" name="pmOutcome" value="passed" id="pmPassed" checked>
+                            <span><strong style="color:#28a745;">PASSED</strong> — student cleared the module</span>
+                        </label>
+                        <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #ccc;border-radius:8px;cursor:pointer;" id="pmFailLabel">
+                            <input type="radio" name="pmOutcome" value="failed">
+                            <span><strong style="color:#dc3545;">FAILED</strong> — student does not pass</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="pmGradeContainer" style="display:none;margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">
+                        Actual Grade Points (0.00 – 4.00) <span style="color:#dc3545;">*</span>
+                    </label>
+                    <input type="number" step="0.01" min="0" max="4" id="pmGradePoints" value="2.00"
+                        style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;">
+                    <div style="font-size:11px;color:#888;margin-top:5px;">Only used for repeat modules (rule 4.10.3 — no cap).</div>
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Remarks (optional)</label>
+                    <textarea id="pmRemarks" rows="2" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;font-family:inherit;" placeholder="e.g. Verified with exam office"></textarea>
+                </div>
+
+                <div id="pmError" style="display:none;padding:12px;background:#f8d7da;color:#721c24;border-radius:6px;font-size:13px;"></div>
+                <div id="pmSuccess" style="display:none;padding:12px;background:#d4edda;color:#155724;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeProcessModal()" style="padding:10px 20px;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;">Cancel</button>
+                <button id="pmSubmitBtn" onclick="submitProcess()" style="padding:10px 20px;background:#003366;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;">✓ Process</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin-policy.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

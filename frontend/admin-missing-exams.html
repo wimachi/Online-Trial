@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Exams - MUBAS Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1400px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;">
+            <h2 style="margin:0;">Missing Exams</h2>
+            <p style="margin:5px 0 0 0;color:#666;">Review and approve student resit requests (PDF §5)</p>
+        </div>
+
+        <div class="gpa-cards" style="margin-bottom:25px;">
+            <div class="gpa-card">
+                <h4>Requested</h4>
+                <div class="value" id="countRequested" style="color:#f59e0b;">--</div>
+                <div class="label">Awaiting decision</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Approved</h4>
+                <div class="value" id="countApproved" style="color:#16a34a;">--</div>
+                <div class="label">Resit scheduled</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Completed</h4>
+                <div class="value" id="countCompleted" style="color:#0891b2;">--</div>
+                <div class="label">Resit done</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Total</h4>
+                <div class="value" id="countTotal" style="color:#003366;">--</div>
+                <div class="label">All requests</div>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin-bottom:20px;">
+            <div class="table-header">
+                <h3>Filter</h3>
+                <div class="filters">
+                    <select id="filterStatus" onchange="renderMissingExams()">
+                        <option value="">All Statuses</option>
+                        <option value="Requested">Requested</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <input type="text" id="searchMissing" placeholder="Search student or module..." oninput="renderMissingExams()">
+                    <button onclick="loadMissingExams()" class="btn btn-primary">Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Missing Exam Requests</h3>
+                <span style="font-size:13px;color:#888;" id="missingCount">--</span>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requested</th>
+                            <th>Student</th>
+                            <th>Module · Assessment</th>
+                            <th>Reason</th>
+                            <th style="text-align:center;">Status</th>
+                            <th>Resit</th>
+                            <th style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="missingBody">
+                        <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="decideModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Decide Missing Exam</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;" id="decideSubtitle">--</p>
+                </div>
+                <button onclick="closeDecideModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div id="decideDetails" style="background:#f0f4f8;padding:15px;border-radius:8px;margin-bottom:20px;font-size:13px;line-height:1.7;"></div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:8px;">Decision <span style="color:#dc3545;">*</span></label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <label style="display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #cbd5e1;border-radius:6px;cursor:pointer;">
+                            <input type="radio" name="mDecision" value="Approved">
+                            <span><strong style="color:#16a34a;">Approve</strong> — grant resit</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #cbd5e1;border-radius:6px;cursor:pointer;">
+                            <input type="radio" name="mDecision" value="Rejected">
+                            <span><strong style="color:#dc2626;">Reject</strong> — award zero</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="resitDateWrap" style="display:none;margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Resit Date <span style="color:#dc3545;">*</span></label>
+                    <input type="date" id="resitDate" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Decision Remarks</label>
+                    <textarea id="decisionRemarks" rows="3" placeholder="Optional notes..."
+                        style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+
+                <div id="decideError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="decideSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeDecideModal()" class="btn btn-secondary">Cancel</button>
+                <button id="decideSubmitBtn" onclick="submitDecision()" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin-missing-exams.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

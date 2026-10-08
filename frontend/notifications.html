@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - MUBAS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:900px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="margin:0;">Notifications</h2>
+                <p style="margin:5px 0 0 0;color:#666;">Your recent activity and alerts</p>
+            </div>
+            <button onclick="markAll()" class="btn btn-primary">Mark All as Read</button>
+        </div>
+
+        <div id="list" class="table-container">
+            <div style="padding:40px;text-align:center;color:#888;">Loading...</div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!requireAuth()) return;
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userName').textContent = user.username || 'User';
+            loadList();
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        }
+
+        function timeAgo(dateStr) {
+            const now = Date.now();
+            const diff = Math.floor((now - new Date(dateStr).getTime()) / 1000);
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + ' days ago';
+            return new Date(dateStr).toLocaleString('en-GB');
+        }
+
+        async function loadList() {
+            const r = await apiRequest('/notifications');
+            if (!r.ok) return;
+            const data = await r.json();
+            const list = data.notifications || [];
+            const container = document.getElementById('list');
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div style="padding:60px;text-align:center;color:#888;">
+                        <div style="font-size:48px;margin-bottom:15px;">📭</div>
+                        <div style="font-weight:600;color:#475569;margin-bottom:5px;">No notifications yet</div>
+                        <div style="font-size:13px;">You'll see alerts here when there\'s activity that concerns you.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(n => `
+                <div onclick="openNotif(${n.notification_id}, '${(n.link || '').replace(/'/g, '&#39;')}')"
+                     style="padding:20px 25px;border-bottom:1px solid #f0f0f0;cursor:pointer;background:${n.is_read ? 'white' : '#eaf4ff'};transition:background 0.2s;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:15px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:200px;">
+                            <div style="font-weight:700;color:#003366;font-size:15px;margin-bottom:5px;">${n.title}</div>
+                            ${n.message ? `<div style="font-size:13px;color:#555;margin-bottom:6px;line-height:1.5;">${n.message}</div>` : ''}
+                            <div style="font-size:12px;color:#999;">${timeAgo(n.created_at)} · ${n.category}</div>
+                        </div>
+                        ${n.is_read ? '' : '<span style="background:#dc3545;color:white;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;flex-shrink:0;">NEW</span>'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openNotif(id, link) {
+            await apiRequest('/notifications/read', {
+                method: 'PUT',
+                body: JSON.stringify({ notificationId: id })
+            });
+            if (link) window.location.href = link;
+            else loadList();
+        }
+
+        async function markAll() {
+            await apiRequest('/notifications/read-all', { method: 'PUT' });
+            loadList();
+        }
+    </script>
+</body>
+</html>

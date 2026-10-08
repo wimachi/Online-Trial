@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegrotat Passes - MUBAS Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1400px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="margin:0;">Aegrotat Passes</h2>
+                <p style="margin:5px 0 0 0;color:#666;">Special pass for incapacitated students with CA ≥ 2.99 (PDF §7)</p>
+            </div>
+            <button onclick="openCreateModal()" class="btn btn-primary">Create Aegrotat</button>
+        </div>
+
+        <div style="margin-bottom:20px;padding:15px 20px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;font-size:13px;color:#333;">
+            <strong>Rule §7.1:</strong> Student's CA average must be <strong>above 2.99</strong> and incapacitation certified by a doctor.<br>
+            <strong>Rule §7.2:</strong> Final-year Aegrotats do <strong>not</strong> qualify for Credit or Distinction.<br>
+            <strong>Rule §7.3:</strong> Must be approved by Senate.
+        </div>
+
+        <div class="gpa-cards" style="margin-bottom:25px;">
+            <div class="gpa-card">
+                <h4>Requested</h4>
+                <div class="value" id="countRequested" style="color:#f59e0b;">--</div>
+                <div class="label">Awaiting decision</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Approved</h4>
+                <div class="value" id="countApproved" style="color:#16a34a;">--</div>
+                <div class="label">Aegrotat granted</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Rejected</h4>
+                <div class="value" id="countRejected" style="color:#dc2626;">--</div>
+                <div class="label">Not eligible</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Total</h4>
+                <div class="value" id="countTotal" style="color:#003366;">--</div>
+                <div class="label">All records</div>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin-bottom:20px;">
+            <div class="table-header">
+                <h3>Filter</h3>
+                <div class="filters">
+                    <select id="filterStatus" onchange="renderAegrotats()">
+                        <option value="">All Statuses</option>
+                        <option value="Requested">Requested</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <input type="text" id="searchAegrotats" placeholder="Search student or module..." oninput="renderAegrotats()">
+                    <button onclick="loadAegrotats()" class="btn btn-primary">Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Aegrotat Records</h3>
+                <span style="font-size:13px;color:#888;" id="aegrotatCount">--</span>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requested</th>
+                            <th>Student</th>
+                            <th>Module</th>
+                            <th style="text-align:center;">CA Avg</th>
+                            <th>Medical Evidence</th>
+                            <th style="text-align:center;">Status</th>
+                            <th style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aegrotatsBody">
+                        <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="createModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Create Aegrotat Request</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">For students with CA ≥ 2.99 and medical certification</p>
+                </div>
+                <button onclick="closeCreateModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Student <span style="color:#dc3545;">*</span></label>
+                    <select id="crStudent" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Offering <span style="color:#dc3545;">*</span></label>
+                    <select id="crOffering" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Overall CA Average (0.00 – 4.00) <span style="color:#dc3545;">*</span></label>
+                    <input type="number" step="0.01" min="0" max="4" id="crCA" value="3.20" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                    <div style="font-size:11px;color:#888;margin-top:5px;">Must be above 2.99 per §7.1</div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Medical Evidence Reference</label>
+                    <input type="text" id="crEvidence" placeholder="e.g. Certificate #MED/2026/0423" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Reason / Notes</label>
+                    <textarea id="crReason" rows="3" placeholder="e.g. Student hospitalized for 3 weeks; missed final exam." style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+                <div id="crError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="crSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeCreateModal()" class="btn btn-secondary">Cancel</button>
+                <button id="crSubmitBtn" onclick="submitCreate()" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="decideModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Decide Aegrotat</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;" id="decideSubtitle">--</p>
+                </div>
+                <button onclick="closeDecideModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div id="decideDetails" style="background:#f0f4f8;padding:15px;border-radius:8px;margin-bottom:20px;font-size:13px;line-height:1.7;"></div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:8px;">Decision <span style="color:#dc3545;">*</span></label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <label style="display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #cbd5e1;border-radius:6px;cursor:pointer;">
+                            <input type="radio" name="aegDecision" value="Approved" checked>
+                            <span><strong style="color:#16a34a;">Approve</strong></span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;padding:12px;border:2px solid #cbd5e1;border-radius:6px;cursor:pointer;">
+                            <input type="radio" name="aegDecision" value="Rejected">
+                            <span><strong style="color:#dc2626;">Reject</strong></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="creditWrap" style="display:none;margin-bottom:15px;padding:12px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;">
+                    <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;cursor:pointer;">
+                        <input type="checkbox" id="aegCredit" style="margin-top:3px;">
+                        <span>
+                            <strong>Eligible for Credit/Distinction?</strong><br>
+                            <span style="font-size:12px;color:#666;">§7.2 — Final-year Aegrotat students are NOT eligible for Credit or Distinction unless they later sit a deferred exam.</span>
+                        </span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Decision Remarks</label>
+                    <textarea id="aegRemarks" rows="3" placeholder="Optional notes..." style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+
+                <div id="decideError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="decideSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeDecideModal()" class="btn btn-secondary">Cancel</button>
+                <button id="decideSubmitBtn" onclick="submitDecision()" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin-aegrotats.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

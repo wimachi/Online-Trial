@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incomplete Grades - MUBAS Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1400px;margin:30px auto;padding:0 20px;">
+        <div class="page-title" style="margin-bottom:25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="margin:0;">Incomplete Grades (INC)</h2>
+                <p style="margin:5px 0 0 0;color:#666;">Track and manage incomplete modules — PDF §6</p>
+            </div>
+            <button onclick="openMarkModal()" class="btn btn-primary">Mark as INC</button>
+        </div>
+
+        <div class="gpa-cards" style="margin-bottom:25px;">
+            <div class="gpa-card">
+                <h4>Active</h4>
+                <div class="value" id="countActive" style="color:#f59e0b;">--</div>
+                <div class="label">Awaiting completion</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Cleared</h4>
+                <div class="value" id="countCleared" style="color:#16a34a;">--</div>
+                <div class="label">Work completed</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Expired</h4>
+                <div class="value" id="countExpired" style="color:#dc2626;">--</div>
+                <div class="label">Became zero</div>
+            </div>
+            <div class="gpa-card">
+                <h4>Total</h4>
+                <div class="value" id="countTotal" style="color:#003366;">--</div>
+                <div class="label">All records</div>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin-bottom:20px;">
+            <div class="table-header">
+                <h3>Filter</h3>
+                <div class="filters">
+                    <select id="filterStatus" onchange="renderIncompletes()">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Cleared">Cleared</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                    <input type="text" id="searchIncompletes" placeholder="Search student or module..." oninput="renderIncompletes()">
+                    <button onclick="loadIncompletes()" class="btn btn-primary">Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Incomplete Grade Records</h3>
+                <span style="font-size:13px;color:#888;" id="incompleteCount">--</span>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Marked</th>
+                            <th>Student</th>
+                            <th>Module</th>
+                            <th>Deadline</th>
+                            <th style="text-align:center;">Days Left</th>
+                            <th style="text-align:center;">Status</th>
+                            <th style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incompletesBody">
+                        <tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="markModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Mark Student as INC</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">Rule §6 — Incomplete work recorded</p>
+                </div>
+                <button onclick="closeMarkModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Student <span style="color:#dc3545;">*</span></label>
+                    <select id="mkStudent" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">Loading students...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Offering <span style="color:#dc3545;">*</span></label>
+                    <select id="mkOffering" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">Loading offerings...</option>
+                    </select>
+                    <div style="font-size:11px;color:#888;margin-top:5px;">Only active-semester offerings are listed.</div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Deadline <span style="color:#dc3545;">*</span></label>
+                    <input type="date" id="mkDeadline" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                    <div style="font-size:11px;color:#888;margin-top:5px;">If not cleared by this date, it becomes a grade of zero (§6.2).</div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Reason</label>
+                    <textarea id="mkReason" rows="3" placeholder="e.g. Student missed final exam due to medical reasons; make-up scheduled." style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:inherit;"></textarea>
+                </div>
+                <div id="mkError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="mkSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeMarkModal()" class="btn btn-secondary">Cancel</button>
+                <button id="mkSubmitBtn" onclick="submitMark()" class="btn btn-primary">Mark INC</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin-incomplete-grades.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

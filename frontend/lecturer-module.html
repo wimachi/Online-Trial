@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Classes - MUBAS Lecturer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/lecturer-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to Modules
+            </a>
+            <span id="userName">Loading...</span>
+            <span style="background:rgba(23,162,184,0.9);padding:3px 10px;border-radius:15px;font-size:11px;">LECTURER</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1300px;margin:30px auto;padding:0 20px;">
+        <div id="loading" style="text-align:center;padding:60px;color:#888;">Loading module...</div>
+
+        <div id="content" style="display:none;">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:26px 30px;border-radius:12px;margin-bottom:24px;box-shadow:0 4px 12px rgba(0,51,102,0.2);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
+                    <div>
+                        <div style="font-size:12px;opacity:0.75;font-weight:700;letter-spacing:0.08em;" id="moduleCode">--</div>
+                        <div style="font-size:24px;font-weight:700;letter-spacing:-0.02em;margin-top:2px;" id="moduleName">--</div>
+                        <div style="font-size:13px;opacity:0.9;margin-top:6px;" id="moduleSubtitle">--</div>
+                    </div>
+                    <div style="text-align:right;font-size:13px;" id="moduleStats">--</div>
+                </div>
+            </div>
+
+            <h3 style="font-size:16px;color:#003366;margin:0 0 15px 0;">Classes teaching this module</h3>
+
+            <div id="classesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+                <div style="text-align:center;padding:40px;color:#888;grid-column:1/-1;">Loading classes...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/lecturer-module.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Detail - MUBAS Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;">
+            <img src="/images/mubas-logo.png" alt="MUBAS" style="height:45px;width:auto;background:white;padding:4px 8px;border-radius:6px;">
+            <h1 style="margin:0;font-size:18px;">MUBAS Assessment System</h1>
+        </div>
+        <div class="user-info">
+            <a href="/admin-dashboard.html" class="header-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span id="userName">Loading...</span>
+            <span style="background:rgba(40,167,69,0.9);padding:3px 10px;border-radius:15px;font-size:11px;" id="userRole">ADMIN</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div style="max-width:1200px;margin:30px auto;padding:0 20px;">
+        <div id="loading" style="text-align:center;padding:60px;color:#888;">Loading student record...</div>
+
+        <div id="content" style="display:none;">
+            <div style="background:linear-gradient(135deg,#003366,#0066cc);color:white;padding:30px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 12px rgba(0,51,102,0.2);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
+                    <div>
+                        <div style="font-size:26px;font-weight:700;margin-bottom:5px;" id="studentName">--</div>
+                        <div style="font-size:14px;opacity:0.9;" id="studentRegNo">--</div>
+                    </div>
+                    <div style="text-align:right;font-size:13px;">
+                        <div id="studentProgram">--</div>
+                        <div id="studentDept" style="opacity:0.85;">--</div>
+                        <div id="studentSchool" style="opacity:0.7;font-size:12px;">--</div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.2);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                    <button onclick="openEvaluateModal()" class="btn btn-warning" style="background:#f59e0b;color:white;">Evaluate a Semester</button>
+                    <button onclick="openStandingModal()" class="btn btn-success">Recompute Standing</button>
+                </div>
+            </div>
+
+            <div class="gpa-cards">
+                <div class="gpa-card">
+                    <h4>Current Year</h4>
+                    <div class="value" id="posYear">--</div>
+                    <div class="label" id="posYearLabel">--</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Semester</h4>
+                    <div class="value" id="posSem">--</div>
+                    <div class="label" id="posSemLabel">--</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Cumulative GPA</h4>
+                    <div class="value" id="posCgpa">--</div>
+                    <div class="label" id="posCredits">--</div>
+                </div>
+                <div class="gpa-card">
+                    <h4>Classification</h4>
+                    <div class="value" id="posClass">--</div>
+                    <div class="label">Projection</div>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top:25px;">
+                <div class="table-header"><h3>GPA Trend</h3></div>
+                <div style="padding:25px;">
+                    <canvas id="gpaTrendChart" style="max-height:320px;"></canvas>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top:25px;">
+                <div class="table-header"><h3>Semester History</h3></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Academic Year</th>
+                                <th>Semester</th>
+                                <th>Modules</th>
+                                <th>Credits</th>
+                                <th>Semester GPA</th>
+                                <th>Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody id="semestersBody">
+                            <tr><td colspan="7" style="text-align:center;color:#888;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top:25px;">
+                <div class="table-header"><h3>All Modules &amp; Assessments</h3></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Module</th>
+                                <th>Module Name</th>
+                                <th>Semester</th>
+                                <th style="text-align:center;">Quiz</th>
+                                <th style="text-align:center;">Assignment</th>
+                                <th style="text-align:center;">Final Exam</th>
+                                <th style="text-align:center;">Final %</th>
+                                <th style="text-align:center;">Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modulesBody">
+                            <tr><td colspan="8" style="text-align:center;color:#888;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="evaluateModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:640px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Evaluate Semester</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">Apply the 2026 GPA rules: Referral / Carryover / Repeat / Withdrawal</p>
+                </div>
+                <button onclick="closeEvaluateModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <div style="background:#fffbeb;border-left:4px solid #f59e0b;padding:12px 15px;border-radius:6px;font-size:13px;color:#333;margin-bottom:20px;">
+                    Choose a semester that has already been graded and released. The system will apply rules 4.8–4.10 and 9.1 based on the student's sGPA, cGPA, and module types.
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;">Semester <span style="color:#dc3545;">*</span></label>
+                    <select id="evalSemester" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+                        <option value="">— Select Semester —</option>
+                    </select>
+                </div>
+                <div id="evalError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="evalSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;line-height:1.6;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeEvaluateModal()" class="btn btn-secondary">Cancel</button>
+                <button id="evalSubmitBtn" onclick="submitEvaluate()" class="btn btn-warning" style="background:#f59e0b;color:white;">Evaluate</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="standingModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;overflow-y:auto;padding:20px;">
+        <div style="max-width:520px;margin:20px auto;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+            <div style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;padding:20px 25px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h2 style="margin:0;font-size:18px;">Recompute Academic Standing</h2>
+                    <p style="margin:3px 0 0 0;font-size:13px;opacity:0.9;">Recalculates Good Standing / Probation / Suspended / Dismissed</p>
+                </div>
+                <button onclick="closeStandingModal()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <div style="padding:25px;">
+                <p style="margin:0 0 15px 0;font-size:14px;color:#333;">
+                    This will analyze the student's recent semester GPAs and update their academic standing.
+                </p>
+                <div id="standingError" style="display:none;padding:12px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:13px;"></div>
+                <div id="standingSuccess" style="display:none;padding:12px;background:#f0fdf4;color:#166534;border-radius:6px;font-size:13px;line-height:1.6;"></div>
+            </div>
+            <div style="padding:15px 25px;background:#f8f9fa;border-top:1px solid #eee;border-radius:0 0 12px 12px;display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="closeStandingModal()" class="btn btn-secondary">Cancel</button>
+                <button id="standingSubmitBtn" onclick="submitStanding()" class="btn btn-success">Recompute</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/js/admin-student.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>
